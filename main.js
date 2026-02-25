@@ -504,7 +504,7 @@ const mealsList = document.getElementById('meals-list');
 // Updates UI based on state
 function updateUI() {
     const todayData = getSelectedDateData();
-    const remaining = state.dailyGoal - todayData.consumed.calories + (todayData.burnedCalories || 0);
+    const remaining = Number((state.dailyGoal - todayData.consumed.calories + (todayData.burnedCalories || 0)).toFixed(1));
     calRemaining.textContent = Math.max(0, remaining);
 
     // Progress Ring Calculation (SVG Circle circumference = 2 * PI * 54 ≈ 339)
@@ -520,9 +520,9 @@ function updateUI() {
     cBar.style.width = `${Math.min((todayData.consumed.carbs / state.macros.carbs) * 100, 100)}%`;
     fBar.style.width = `${Math.min((todayData.consumed.fats / state.macros.fats) * 100, 100)}%`;
 
-    pVal.textContent = todayData.consumed.protein;
-    cVal.textContent = todayData.consumed.carbs;
-    fVal.textContent = todayData.consumed.fats;
+    pVal.textContent = todayData.consumed.protein.toFixed(1).replace(/\.0$/, '');
+    cVal.textContent = todayData.consumed.carbs.toFixed(1).replace(/\.0$/, '');
+    fVal.textContent = todayData.consumed.fats.toFixed(1).replace(/\.0$/, '');
 
     // Water Tracker
     waterCountDisplay.textContent = todayData.water || 0;
@@ -607,10 +607,10 @@ addMealForm.addEventListener('submit', (e) => {
 
     const newMeal = {
         name: document.getElementById('meal-name').value,
-        calories: parseInt(document.getElementById('meal-cal').value) || 0,
-        protein: parseInt(document.getElementById('meal-p').value) || 0,
-        carbs: parseInt(document.getElementById('meal-c').value) || 0,
-        fats: parseInt(document.getElementById('meal-f').value) || 0,
+        calories: Number(document.getElementById('meal-cal').value) || 0,
+        protein: Number(document.getElementById('meal-p').value) || 0,
+        carbs: Number(document.getElementById('meal-c').value) || 0,
+        fats: Number(document.getElementById('meal-f').value) || 0,
         id: Date.now()
     };
 
@@ -810,7 +810,7 @@ Devuelve ÚNICAMENTE un objeto JSON válido con la clave "burnedCalories" (numbe
             throw new Error('No se pudo analizar el resultado de la IA.');
         }
 
-        const burnedInput = parseInt(aiResult.burnedCalories) || 0;
+        const burnedInput = Number(aiResult.burnedCalories) || 0;
 
         if (burnedInput > 0) {
             const todayData = getSelectedDateData();
