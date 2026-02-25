@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CalorIA</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CalorIA">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <!-- Onboarding Screen -->
+    <div id="onboarding" class="onboarding-container">
+        <div class="onboarding-header">
+            <h2>Bienvenido a MacroTracker</h2>
+            <p>Conozcámonos un poco para personalizar tu plan.</p>
+        </div>
+        <form id="onboarding-form">
+            <div class="form-group">
+                <label for="user-name-input">Tu nombre</label>
+                <input type="text" id="user-name-input" placeholder="Ej. Juan" required>
+            </div>
+
+            <div class="macro-inputs">
+                <div class="form-group">
+                    <label for="user-age">Edad</label>
+                    <input type="number" id="user-age" placeholder="Años" required min="15" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="user-weight">Peso (kg)</label>
+                    <input type="number" id="user-weight" placeholder="kg" required min="30" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="user-height">Altura (cm)</label>
+                    <input type="number" id="user-height" placeholder="cm" required min="100">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="user-gender">Género</label>
+                <select id="user-gender" class="custom-select" required>
+                    <option value="" disabled selected>Selecciona...</option>
+                    <option value="male">Masculino</option>
+                    <option value="female">Femenino</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="user-activity">Nivel de Actividad</label>
+                <select id="user-activity" class="custom-select" required>
+                    <option value="" disabled selected>Selecciona...</option>
+                    <option value="1.2">Sedentario (Poco o ningún ejercicio)</option>
+                    <option value="1.375">Ligero (Ejercicio 1-3 días/semana)</option>
+                    <option value="1.55">Moderado (Ejercicio 3-5 días/semana)</option>
+                    <option value="1.725">Activo (Ejercicio 6-7 días/semana)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="user-goal">Objetivo</label>
+                <select id="user-goal" class="custom-select" required>
+                    <option value="" disabled selected>Selecciona tu meta...</option>
+                    <option value="lose">Perder peso (-500 kcal)</option>
+                    <option value="maintain">Mantener peso</option>
+                    <option value="gain">Ganar masa muscular (+300 kcal)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 20px;">Calcular mi Plan</button>
+        </form>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="hidden">
+        <header>
+            <div class="header-content">
+                <h1>Hola, <span id="user-name-display">Usuario</span></h1>
+                <p>Tu resumen de hoy</p>
+            </div>
+            <div class="date-navigation">
+                <button id="prev-day" class="date-nav-btn">&lt;</button>
+                <div class="date-display" id="date-display">25 Feb</div>
+                <button id="next-day" class="date-nav-btn" disabled>&gt;</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Dashboard View -->
+            <div id="home-view" class="view-section active">
+                <section class="summary-card">
+                    <div class="calories-main">
+                        <div class="progress-ring">
+                            <svg width="120" height="120">
+                                <circle class="ring-bg" cx="60" cy="60" r="54"></circle>
+                                <circle class="ring-fg" cx="60" cy="60" r="54" id="cal-ring"></circle>
+                            </svg>
+                            <div class="cal-text">
+                                <span id="cal-remaining">0</span>
+                                <small>restantes</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="macros-grid">
+                        <div class="macro-item protein">
+                            <span class="label">Proteína</span>
+                            <div class="bar-container">
+                                <div class="bar" style="width: 0%" id="p-bar"></div>
+                            </div>
+                            <span class="value"><span id="p-val">0</span>/<span id="p-goal">0</span>g</span>
+                        </div>
+                        <div class="macro-item carbs">
+                            <span class="label">Carbos</span>
+                            <div class="bar-container">
+                                <div class="bar" style="width: 0%" id="c-bar"></div>
+                            </div>
+                            <span class="value"><span id="c-val">0</span>/<span id="c-goal">0</span>g</span>
+                        </div>
+                        <div class="macro-item fats">
+                            <span class="label">Grasas</span>
+                            <div class="bar-container">
+                                <div class="bar" style="width: 0%" id="f-bar"></div>
+                            </div>
+                            <span class="value"><span id="f-val">0</span>/<span id="f-goal">0</span>g</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="summary-card water-card"
+                    style="margin-top: 20px; flex-direction: column; align-items: center; gap: 12px;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700;">💧 Registro de Agua</h2>
+                    <div class="water-tracker">
+                        <button id="water-minus-btn" class="water-btn">-</button>
+                        <div class="water-display" style="display: flex; flex-direction: column; align-items: center;">
+                            <div>
+                                <span id="water-count"
+                                    style="font-size: 1.6rem; font-weight: 700; color: #0284c7;">0</span>
+                                <span id="water-target"
+                                    style="color: var(--text-muted); font-size: 1rem; font-weight: 600;">/ 0</span>
+                            </div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: -4px;">(250ml)</span>
+                        </div>
+                        <button id="water-plus-btn" class="water-btn">+</button>
+                    </div>
+                </section>
+
+                <section class="meals-section">
+                    <div class="section-header">
+                        <h2>Comidas de hoy</h2>
+                        <div style="display: flex; gap: 12px;">
+                            <button id="ai-meal-btn" class="fab ai-btn">📷</button>
+                            <input type="file" id="ai-image-input" accept="image/*" class="hidden">
+                            <button id="add-meal-btn" class="fab">+</button>
+                        </div>
+                    </div>
+                    <div id="meals-list" class="meals-list">
+                        <!-- Las comidas se insertarán aquí -->
+                        <div class="empty-state">No has agregado comidas hoy</div>
+                    </div>
+                </section>
+
+                <section class="summary-card exercise-card" style="margin-top: 20px;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px;">🏃‍♂️ Ejercicio y Quema Activa
+                    </h2>
+                    <form id="exercise-form" style="display: flex; gap: 8px;">
+                        <input type="text" id="exercise-desc-input" placeholder="Ej. 45 min pesas, 10 min trote..."
+                            required style="flex: 1; margin-bottom: 0;">
+                        <button type="submit" id="exercise-submit-btn" class="btn-primary"
+                            style="padding: 0 16px; width: auto; font-weight: 600;">Calcular</button>
+                    </form>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Describe tu ejercicio
+                        físico y la Inteligencia Artificial calculará un reembolso aproximado de las calorías quemadas.
+                    </p>
+                    <div id="exercises-list" class="meals-list" style="margin-top: 16px;"></div>
+                </section>
+            </div>
+
+            <!-- Progress View -->
+            <div id="progress-view" class="view-section hidden">
+                <section class="summary-card"
+                    style="flex-direction: column; align-items: stretch; margin-bottom: 20px;">
+                    <h2 style="font-size: 1.1rem; margin-bottom: 16px;">Progreso de Peso</h2>
+                    <div class="chart-container" style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="weight-chart"></canvas>
+                    </div>
+                </section>
+
+                <section class="weight-input-section">
+                    <form id="log-weight-form" class="summary-card"
+                        style="flex-direction: column; align-items: stretch; gap: 12px;">
+                        <h3 style="font-size: 1rem;">Registrar Peso de Hoy</h3>
+                        <div style="display: flex; gap: 12px; align-items: flex-end;">
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <input type="number" id="new-weight-input" placeholder="Ej. 70.5" step="0.1" required>
+                            </div>
+                            <button type="submit" class="btn-primary"
+                                style="margin-top: 0; width: auto; padding: 12px 24px;">Guardar</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="view-section hidden">
+                <section class="summary-card"
+                    style="flex-direction: column; align-items: stretch; margin-bottom: 20px;">
+                    <h2 style="font-size: 1.1rem; margin-bottom: 16px;">Configuración</h2>
+                    <form id="settings-form" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="gemini-api-key">Gemini API Key</label>
+                            <input type="password" id="gemini-api-key" placeholder="Pega tu API Key de Google Studio">
+                            <small
+                                style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 6px;">
+                                Necesaria para la estimación de macros por foto. Tu clave se guarda de manera segura
+                                solo en este navegador.
+                            </small>
+                        </div>
+                        <button type="submit" class="btn-primary" style="margin-top: 8px;">Guardar
+                            Configuración</button>
+                    </form>
+                </section>
+            </div>
+        </main>
+
+        <!-- Add Meal Modal -->
+        <div id="add-meal-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Añadir Comida</h3>
+                    <button id="close-modal-btn" class="close-btn">&times;</button>
+                </div>
+                <form id="add-meal-form">
+                    <div class="form-group">
+                        <label for="meal-name">Nombre del alimento</label>
+                        <div class="search-input-wrapper">
+                            <input type="text" id="meal-name" placeholder="Ej. Pechuga de pollo" required>
+                            <button type="button" id="search-macros-btn" title="Buscar macros con IA">🔍</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="meal-cal">Calorías (kcal)</label>
+                        <input type="number" id="meal-cal" placeholder="0" required min="0">
+                    </div>
+                    <div class="macro-inputs">
+                        <div class="form-group">
+                            <label for="meal-p">Prot. (g)</label>
+                            <input type="number" id="meal-p" placeholder="0" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="meal-c">Carb. (g)</label>
+                            <input type="number" id="meal-c" placeholder="0" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="meal-f">Grasas (g)</label>
+                            <input type="number" id="meal-f" placeholder="0" required min="0">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Guardar Alimento</button>
+                </form>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <button id="nav-home" class="nav-item active">🏠</button>
+            <button id="nav-progress" class="nav-item">📈</button>
+            <button id="nav-settings" class="nav-item">⚙️</button>
+        </nav>
+    </div>
+
+    <!-- AI Loading Overlay -->
+    <div id="ai-loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Analizando imagen con Gemini...</p>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(registration => {
+                    console.log('SW registered: ', registration);
+                }).catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
