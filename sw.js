@@ -1,7 +1,7 @@
 const CACHE_NAME = 'caloria-v2';
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
+    '/caloria/'
+    '/caloria/index.html'
     '/style.css',
     '/main.js',
     '/manifest.json'
@@ -36,3 +36,4 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
+
