@@ -2,7 +2,7 @@
     "name": "CalorIA",
     "short_name": "CalorIA",
     "description": "Tu nutriólogo inteligente personal",
-    "start_url": "/",
+    "start_url": "/caloria/",
     "display": "standalone",
     "background_color": "#0f172a",
     "theme_color": "#10b981",
@@ -13,4 +13,5 @@
             "type": "image/png"
         }
     ]
+
 }
