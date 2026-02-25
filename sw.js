@@ -1,10 +1,10 @@
 const CACHE_NAME = 'caloria-v2';
 const ASSETS_TO_CACHE = [
-    '/caloria/'
-    '/caloria/index.html'
-    '/style.css',
-    '/main.js',
-    '/manifest.json'
+    './',
+    'index.html',
+    'style.css',
+    'main.js',
+    'manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -36,4 +36,3 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
-
